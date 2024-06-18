@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import gsap from 'gsap'
 
 //Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -32,8 +33,6 @@ const cube3 = new THREE.Mesh(
 )
 group.add(cube3)
 cube3.position.x=2
-
-
 
 
 /* Cube
@@ -71,4 +70,29 @@ const renderer = new THREE.WebGLRenderer({
     canvas: canvas
 })
 renderer.setSize(sizes.width, sizes.height)
-renderer.render(scene,camera)
+
+
+//Animations
+const clock = new THREE.Clock()
+
+gsap.to(group.position,{duration: 1, delay:1, x:2}) //se llamará esta animación de transform una soal vez
+gsap.to(group.position,{duration: 1, delay:3, x:0})
+
+const Update = () => //funcion
+{
+
+
+
+    
+    // Clock
+    const elapsedTime = clock.getElapsedTime()
+
+    group.rotation.y = elapsedTime * Math.PI * 0.5
+    group.position.y= Math.sin(elapsedTime *0.5) //así nos aseguramos de que el objeto vuelva al usar un seno y pasarle el tiempos
+    //render
+    
+    
+    renderer.render(scene,camera)//el render debe ir dentro del update
+    window.requestAnimationFrame(Update) //se genere un loop
+}
+Update() //si no pones el nombre d ela funcion aqui solo se reproducirá una vez
