@@ -1,121 +1,130 @@
 import * as THREE from 'three'
 import gsap from 'gsap'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import GUI from 'lil-gui'
 
+/**
+ * Debug
+ */
+const gui = new GUI()
+const debugObject = {}
 
-//Cursor
-const cursor ={
+// Cursor
+const cursor = {
     x: 0,
-    y:0
+    y: 0
 }
-window.addEventListener('mousemove', (event) =>{
-    cursor.x = event.clientX/sizes.width -0.5
-    cursor.y = event.clientY/sizes.height -0.5
+window.addEventListener('mousemove', (event) => {
+    cursor.x = event.clientX / sizes.width - 0.5
+    cursor.y = event.clientY / sizes.height - 0.5
 })
 
-//Canvas
+// Canvas
 const canvas = document.querySelector('canvas.webgl')
 
-
-//scene
+// Scene
 const scene = new THREE.Scene()
 
+debugObject.color = '#3a6ea6'
 
-
-//Object
-
-const group = new THREE.Group
-//group.rotation.y=
+const group = new THREE.Group()
 scene.add(group)
+const material = new THREE.MeshBasicMaterial({ color: debugObject.color, wireframe: true })
+
 const cube1 = new THREE.Mesh(
-    new THREE.BoxGeometry(1,1,1),
-    new THREE.MeshBasicMaterial({color: 0x0ff0000})
+    new THREE.BoxGeometry(1, 1, 1),
+    material
 )
-cube1.position.x=0
+cube1.position.x = 0
 group.add(cube1)
 const cube2 = new THREE.Mesh(
-    new THREE.BoxGeometry(1,1,1),
-    new THREE.MeshBasicMaterial({color: 0x00ff00})
+    new THREE.BoxGeometry(1, 1, 1),
+    material
 )
+cube2.position.x = -2
 group.add(cube2)
-cube1.position.x=-2
 const cube3 = new THREE.Mesh(
-    new THREE.BoxGeometry(1,1,1),
-    new THREE.MeshBasicMaterial({color: 0x0000ff})
+    new THREE.BoxGeometry(1, 1, 1),
+    material
 )
+cube3.position.x = 2
 group.add(cube3)
-cube3.position.x=2
 
-
-/* Cube
-group.add(cube1)
-const geometry = new THREE.BoxGeometry(1,1,1) //crea la geometria d ela escena
-const material = new THREE.MeshBasicMaterial({ color: 0xff0000})  // crea un material 
-const mesh = new THREE.Mesh(geometry, material) // añade el material a la geometria y lo deja en un mesh
-mesh.position.set(-1,-1,0) //así se el da una coordenada a el objeto en el espacio
-scene.add(mesh) //inicializa el mesh en la escena
-*/
-// Axes helper
-const axesHelper = new THREE.AxesHelper(0.5)//genera un eje X,Y,Z visual
-scene.add(axesHelper) //lo agrego a la escena
-
-//Sizes of camera
-const sizes = {
-    width:1800,
-    height:1600 
+// GUI
+gui.add(group.position, 'y').min(-3).max(3).step(0.01)
+gui.add(group, 'visible')
+gui.add(material, 'wireframe')
+gui.addColor(debugObject, 'color').onChange(() => {
+    material.color.set(debugObject.color)
+})
+debugObject.spin = () => {
+    gsap.to(group.rotation, { y: group.rotation.y + Math.PI * 2 })
 }
-/*
-//Scale
-mesh.scale.set(2,1,2)//así se cambia la escala del objeto
+gui.add(debugObject, 'spin')
 
-//Rotation
-mesh.rotation.x= Math.PI * 1.1 //así es como se rota un objeot, las coordenadas funcionande 0 a 2 
-*/
-//camera
-const camera = new THREE.PerspectiveCamera(150, sizes.width / sizes.height,0.1,100) //crea la nueva camara y le da un fov
-//camera.position.z= 20
+// Axes helper
+const axesHelper = new THREE.AxesHelper(0.5)
+scene.add(axesHelper)
+
+// Sizes of camera
+const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight
+}
+
+window.addEventListener('resize', () => {
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+})
+
+// Camera
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
+camera.position.z = 5
 scene.add(camera)
-//camera.lookAt(mesh.position) Así se hace un lookat
 
-//Renderer
+// Renderer
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
 })
 renderer.setSize(sizes.width, sizes.height)
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
+// Fullscreen toggle
+window.addEventListener('dblclick', () => {
+    const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement
+    if (!fullscreenElement) {
+        if (canvas.requestFullscreen) {
+            canvas.requestFullscreen()
+        } else if (canvas.webkitRequestFullscreen) {
+            canvas.webkitRequestFullscreen()
+        }
+    } else {
+        document.exitFullscreen()
+    }
+})
 
-//Animations
-//const clock = new THREE.Clock()
+// Orbit Controls
+const controls = new OrbitControls(camera, canvas)
+controls.enableDamping = true
+controls.rotateSpeed = 0.5
+controls.zoomSpeed = 0.01
 
-gsap.to(group.position,{duration: 1, delay:1, x:2}) //se llamará esta animación de transform una soal vez
-gsap.to(group.position,{duration: 1, delay:3, x:0})
+const tick = () => {
+    // Update controls
+    controls.update()
 
-const Update = () => //funcion
-{
+    // Render
+    renderer.render(scene, camera)
 
-
-/*
-    
-    // Clock
-    const elapsedTime = clock.getElapsedTime()
-
-    group.rotation.y = elapsedTime * Math.PI * 0.5
-    group.position.y= Math.sin(elapsedTime *0.5) //así nos aseguramos de que el objeto vuelva al usar un seno y pasarle el tiempos
-    //render
-    */
-    
-    //Update camera
-
-    /* modo apuntado
-    camera.position.x = cursor.x*-4
-    camera.position.y = cursor.y*4
-    camera.lookAt(new THREE.Vector3())
-    */
-    camera.lookAt(new THREE.Vector3())
-   camera.position.x=Math.sin(cursor.x*Math.PI*2)*3
-   camera.position.z=Math.cos(cursor.x*Math.PI*2)*3
-   camera.position.y= cursor.y * 5
-   
-    renderer.render(scene,camera)//el render debe ir dentro del update
-    window.requestAnimationFrame(Update) //se genere un loop
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick)
 }
-Update() //si no pones el nombre d ela funcion aqui solo se reproducirá una vez
+tick()
