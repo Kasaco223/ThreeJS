@@ -1,6 +1,17 @@
 import * as THREE from 'three'
 import gsap from 'gsap'
 
+
+//Cursor
+const cursor ={
+    x: 0,
+    y:0
+}
+window.addEventListener('mousemove', (event) =>{
+    cursor.x = event.clientX/sizes.width -0.5
+    cursor.y = event.clientY/sizes.height -0.5
+})
+
 //Canvas
 const canvas = document.querySelector('canvas.webgl')
 
@@ -60,8 +71,8 @@ mesh.scale.set(2,1,2)//así se cambia la escala del objeto
 mesh.rotation.x= Math.PI * 1.1 //así es como se rota un objeot, las coordenadas funcionande 0 a 2 
 */
 //camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height) //crea la nueva camara y le da un fov
-camera.position.z= 4
+const camera = new THREE.PerspectiveCamera(150, sizes.width / sizes.height,0.1,100) //crea la nueva camara y le da un fov
+//camera.position.z= 20
 scene.add(camera)
 //camera.lookAt(mesh.position) Así se hace un lookat
 
@@ -73,7 +84,7 @@ renderer.setSize(sizes.width, sizes.height)
 
 
 //Animations
-const clock = new THREE.Clock()
+//const clock = new THREE.Clock()
 
 gsap.to(group.position,{duration: 1, delay:1, x:2}) //se llamará esta animación de transform una soal vez
 gsap.to(group.position,{duration: 1, delay:3, x:0})
@@ -82,7 +93,7 @@ const Update = () => //funcion
 {
 
 
-
+/*
     
     // Clock
     const elapsedTime = clock.getElapsedTime()
@@ -90,8 +101,20 @@ const Update = () => //funcion
     group.rotation.y = elapsedTime * Math.PI * 0.5
     group.position.y= Math.sin(elapsedTime *0.5) //así nos aseguramos de que el objeto vuelva al usar un seno y pasarle el tiempos
     //render
+    */
     
-    
+    //Update camera
+
+    /* modo apuntado
+    camera.position.x = cursor.x*-4
+    camera.position.y = cursor.y*4
+    camera.lookAt(new THREE.Vector3())
+    */
+    camera.lookAt(new THREE.Vector3())
+   camera.position.x=Math.sin(cursor.x*Math.PI*2)*3
+   camera.position.z=Math.cos(cursor.x*Math.PI*2)*3
+   camera.position.y= cursor.y * 5
+   
     renderer.render(scene,camera)//el render debe ir dentro del update
     window.requestAnimationFrame(Update) //se genere un loop
 }
