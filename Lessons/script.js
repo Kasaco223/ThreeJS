@@ -4,9 +4,27 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import GUI from 'lil-gui'
 
 /**
+ * Textures
+ */
+const image = new Image()
+
+/**
  * Debug
  */
-const gui = new GUI()
+const gui = new GUI({ //inicializa la gui
+    width: 300, //le da un tamaño
+    title: 'Nice debug UI', //le da un titulo
+    closeFolders: true //minimiza los folders
+})
+gui.close() //minimiza toda la UI
+gui.hide() //la oculta
+
+window.addEventListener('keydown', (event) => //evento que escucha si usan una tecla
+{
+    if(event.key == 'h') //si la tecla es la h  .  . .
+        gui.show(gui._hidden) //enciende la gui si es false y la apaga si es true
+})
+
 const debugObject = {}
 
 // Cursor
@@ -29,7 +47,7 @@ debugObject.color = '#3a6ea6'
 
 const group = new THREE.Group()
 scene.add(group)
-const material = new THREE.MeshBasicMaterial({ color: debugObject.color, wireframe: true })
+const material = new THREE.MeshBasicMaterial({ color: debugObject.color, wireframe: false })
 
 const cube1 = new THREE.Mesh(
     new THREE.BoxGeometry(1, 1, 1),
@@ -51,16 +69,39 @@ cube3.position.x = 2
 group.add(cube3)
 
 // GUI
-gui.add(group.position, 'y').min(-3).max(3).step(0.01)
-gui.add(group, 'visible')
-gui.add(material, 'wireframe')
-gui.addColor(debugObject, 'color').onChange(() => {
+const cubeTweaks = gui.addFolder('Awesome cube')
+
+cubeTweaks.add(group.position, 'y').min(-3).max(3).step(0.01)
+cubeTweaks.add(group, 'visible')
+cubeTweaks.add(material, 'wireframe')
+cubeTweaks.addColor(debugObject, 'color').onChange(() => {
     material.color.set(debugObject.color)
 })
 debugObject.spin = () => {
     gsap.to(group.rotation, { y: group.rotation.y + Math.PI * 2 })
 }
-gui.add(debugObject, 'spin')
+cubeTweaks.add(debugObject, 'spin')
+debugObject.subdivision = 2
+cubeTweaks
+    .add(debugObject, 'subdivision')
+    .min(1)
+    .max(20)
+    .step(1)
+    .onFinishChange(() =>
+    {
+        cube1.geometry.dispose()
+        cube1.geometry = new THREE.BoxGeometry(
+            1, 1, 1, debugObject.subdivision, debugObject.subdivision, debugObject.subdivision
+        )
+        cube2.geometry.dispose()
+        cube2.geometry = new THREE.BoxGeometry(
+            1, 1, 1, debugObject.subdivision, debugObject.subdivision, debugObject.subdivision
+        )
+        cube3.geometry.dispose()
+        cube3.geometry = new THREE.BoxGeometry(
+            1, 1, 1, debugObject.subdivision, debugObject.subdivision, debugObject.subdivision
+        )
+    })
 
 // Axes helper
 const axesHelper = new THREE.AxesHelper(0.5)
