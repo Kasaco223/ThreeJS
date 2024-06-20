@@ -6,9 +6,53 @@ import GUI from 'lil-gui'
 /**
  * Textures
  */
-const image = new Image()
+const loadingManager = new THREE.LoadingManager()
+//etos metodos son opcionales pero nos ayudan a saber el estado d el aimagen
+loadingManager.onStart = () =>
+{
+    console.log('onStart')
+}
+loadingManager.onLoad = () =>
+{
+    console.log('onLoaded')
+}
+loadingManager.onProgress = () =>
+{
+    console.log('onProfress')
+}
+loadingManager.onError = () =>
+{
+        console.log('onError')
+}
 
-/**
+const textureLoader = new THREE.TextureLoader(loadingManager) //revisamos si la textura cargó (este metodo revisa a todas las texturas de la escena)
+const colorTexture = textureLoader.load('./textures/Color.jpg') 
+const alphaTexture = textureLoader.load('./textures/Color.jpg') 
+const heightTexture = textureLoader.load('./textures/Color.jpg') 
+const normalTexture = textureLoader.load('./textures/Color.jpg') 
+const ambientOcclusionTexture = textureLoader.load('./textures/Color.jpg') 
+const metalnessTexture = textureLoader.load('./textures/Color.jpg') 
+const rougnessTexture = textureLoader.load('./textures/Color.jpg') 
+
+colorTexture.colorSpace = THREE.SRGBColorSpace //nos aseguramos de que trabaje en RGB
+
+//filters
+
+colorTexture.minFilter = THREE.NearestFilter //sirve para que de cerca la textura se vea 10/10
+
+/*
+const image = new Image() //inicializamos la imagen que usaremos
+const texture = new THREE.Texture(image) //creamos la variable de la textura global y la inicializamos con la imagen
+texture.colorSpace = THREE.SRGBColorSpace
+image.onload = () => //creamos una función que se de cuenta cuando la imagen haya sido cargada
+    {
+      texture.needsUpdate = true //actualizamos el estado de la imagen cuando cargue
+    }
+
+    image.src = './textures/000.jpg' //traemos la imagen desde la carpeta
+*/
+
+    /**
  * Debug
  */
 const gui = new GUI({ //inicializa la gui
@@ -43,11 +87,11 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
-debugObject.color = '#3a6ea6'
+debugObject.color = {map: colorTexture}
 
 const group = new THREE.Group()
 scene.add(group)
-const material = new THREE.MeshBasicMaterial({ color: debugObject.color, wireframe: false })
+const material = new THREE.MeshBasicMaterial({ map: colorTexture, wireframe: false })
 
 const cube1 = new THREE.Mesh(
     new THREE.BoxGeometry(1, 1, 1),
@@ -156,7 +200,7 @@ window.addEventListener('dblclick', () => {
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
 controls.rotateSpeed = 0.5
-controls.zoomSpeed = 0.01
+controls.zoomSpeed = 1
 
 const tick = () => {
     // Update controls
