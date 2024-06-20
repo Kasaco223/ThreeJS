@@ -1,0 +1,19 @@
+{
+  "name": "lessontexture",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "dat.gui": "^0.7.9",
+    "lil-gui": "^0.19.2",
+    "three": "^0.165.0",
+    "vite": "^5.3.1"
+  }
+}
